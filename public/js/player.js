@@ -8,7 +8,8 @@
   const overlay = document.getElementById('plVideoOverlay');
   const seekFlashL = document.getElementById('seekFlashL');
   const seekFlashR = document.getElementById('seekFlashR');
-  const tempoBars = document.getElementById('tempoBars').querySelectorAll('span');
+  const tempoBarsEl = document.getElementById('tempoBars');
+  const tempoBars = tempoBarsEl.querySelectorAll('span');
   const plTitle = document.getElementById('plTitle');
   const plArtist = document.getElementById('plArtist');
   const plMode = document.getElementById('plMode');
@@ -24,6 +25,28 @@
   function el() { return player.mode === 'video' ? videoEl : audioEl; }
   function isPlaying() { const e = el(); return e && !e.paused && !e.ended; }
   function syncPlayingClass() { page.classList.toggle('is-playing', isPlaying()); }
+
+  // ── Colorful bar palette ──
+  const BAR_COLORS = [
+    '#38bdf8', // cyan
+    '#818cf8', // indigo
+    '#f472b6', // pink
+    '#34d399', // emerald
+    '#fb923c', // orange
+    '#a78bfa', // violet
+    '#f87171', // coral
+    '#facc15', // yellow
+    '#2dd4bf', // teal
+    '#e879f9', // fuchsia
+    '#60a5fa', // blue
+    '#4ade80', // green
+  ];
+
+  // Assign each bar a random color from the palette
+  tempoBars.forEach((bar, i) => {
+    bar.style.background = BAR_COLORS[i % BAR_COLORS.length];
+    bar.style.boxShadow = `0 0 8px ${BAR_COLORS[i % BAR_COLORS.length]}88`;
+  });
 
   // ── Render meta ──
   function renderMeta(t) {
@@ -48,14 +71,11 @@
     if (t.type === 'video') {
       videoStage.hidden = false;
       cover.hidden = true;
-      // Move the persistent video element into the stage
       if (videoEl.parentElement !== videoStage) videoStage.prepend(videoEl);
-      // Restore styles overridden by shell hidden state
       Object.assign(videoEl.style, { position: 'absolute', left: '0', top: '0', width: '100%', height: '100%' });
     } else {
       videoStage.hidden = true;
       cover.hidden = false;
-      // Send video off-screen
       Object.assign(videoEl.style, { position: 'fixed', left: '-9999px', top: '-9999px', width: '1px', height: '1px' });
     }
   }
@@ -88,7 +108,7 @@
     seekFromEvent(e);
   });
   plSeek.addEventListener('pointermove', (e) => { if (dragging) seekFromEvent(e); });
-  plSeek.addEventListener('pointerup',   (e) => { dragging = false; plSeek.classList.remove('dragging'); });
+  plSeek.addEventListener('pointerup',   () => { dragging = false; plSeek.classList.remove('dragging'); });
 
   // ── Controls ──
   document.getElementById('plPlay').addEventListener('click', () => player.toggle());
@@ -108,11 +128,73 @@
     WAVR.toast(repeat ? 'Repeat on' : 'Repeat off');
   });
 
-  // Volume — initialize from elements
   plVol.value = audioEl.volume;
   plVol.addEventListener('input', () => player.setVolume(parseFloat(plVol.value)));
 
-  // ── Video overlay: click = toggle controls; double-tap left/right = seek ±10s ──
+  // ── Download modal ──
+  document.getElementById('plDownloadBtn').addEventListener('click', () => {
+    const t = player.current;
+    if (!t || !t.youtube_id) { WAVR.toast('Nothing playing to download'); return; }
+    showDownloadModal(t);
+  });
+
+  function showDownloadModal(t) {
+    // Remove existing modal if any
+    const existing = document.getElementById('plDlModalBackdrop');
+    if (existing) existing.remove();
+
+    const backdrop = document.createElement('div');
+    backdrop.id = 'plDlModalBackdrop';
+    backdrop.className = 'pl-dl-modal-backdrop';
+    backdrop.innerHTML = `
+      <div class="pl-dl-modal">
+        <div class="pl-dl-modal-title">Download</div>
+        <div class="pl-dl-modal-sub">${WAVR.escHtml ? WAVR.escHtml(t.title || 'Track') : (t.title || 'Track')}</div>
+        <div class="pl-dl-options">
+          <button class="pl-dl-option audio" id="dlOptAudio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+            </svg>
+            Audio
+            <span style="font-size:.75rem;color:var(--text-3);font-weight:400">MP3</span>
+          </button>
+          <button class="pl-dl-option video" id="dlOptVideo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="15" height="10" rx="2"/><path d="M17 9l5-3v12l-5-3"/>
+            </svg>
+            Video
+            <span style="font-size:.75rem;color:var(--text-3);font-weight:400">MP4</span>
+          </button>
+        </div>
+        <button class="pl-dl-modal-cancel" id="dlCancel">Cancel</button>
+      </div>`;
+
+    document.body.appendChild(backdrop);
+
+    document.getElementById('dlOptAudio').addEventListener('click', () => {
+      triggerDownload(t.youtube_id, 'audio', t.title);
+      backdrop.remove();
+    });
+    document.getElementById('dlOptVideo').addEventListener('click', () => {
+      triggerDownload(t.youtube_id, 'video', t.title);
+      backdrop.remove();
+    });
+    document.getElementById('dlCancel').addEventListener('click', () => backdrop.remove());
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) backdrop.remove(); });
+  }
+
+  function triggerDownload(youtubeId, format, title) {
+    const url = `/api/download?id=${encodeURIComponent(youtubeId)}&format=${format}`;
+    WAVR.toast(`Starting ${format} download…`);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title || youtubeId}.${format === 'audio' ? 'mp3' : 'mp4'}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  // ── Video overlay double-tap ──
   let lastTap = 0, lastTapSide = null, controlsTimer = null;
   function showControls() {
     overlay.classList.add('show-controls');
@@ -124,7 +206,6 @@
     const side = (e.clientX - r.left) < r.width / 2 ? 'L' : 'R';
     const now = Date.now();
     if (now - lastTap < 320 && side === lastTapSide) {
-      // double-tap
       if (side === 'L') { player.seekRel(-10); seekFlashL.classList.remove('flash'); void seekFlashL.offsetWidth; seekFlashL.classList.add('flash'); }
       else              { player.seekRel(+10); seekFlashR.classList.remove('flash'); void seekFlashR.offsetWidth; seekFlashR.classList.add('flash'); }
       lastTap = 0;
@@ -142,31 +223,40 @@
       case ' ': e.preventDefault(); player.toggle(); break;
       case 'ArrowRight': player.seekRel(+5); break;
       case 'ArrowLeft':  player.seekRel(-5); break;
-      case 'ArrowUp':   plVol.value = Math.min(1, +plVol.value + .05); player.setVolume(+plVol.value); break;
-      case 'ArrowDown': plVol.value = Math.max(0, +plVol.value - .05); player.setVolume(+plVol.value); break;
+      case 'ArrowUp':    plVol.value = Math.min(1, +plVol.value + .05); player.setVolume(+plVol.value); break;
+      case 'ArrowDown':  plVol.value = Math.max(0, +plVol.value - .05); player.setVolume(+plVol.value); break;
     }
   }
   document.addEventListener('keydown', keyHandler);
 
-  // ── Tempo bars (driven by analyser) ──
+  // ── Random colorful tempo bars animation ──
+  // Each bar animates independently on its own random schedule, no analyser needed
   let rafId = null;
-  const smooth = new Array(tempoBars.length).fill(0);
-  function tick() {
-    if (!player.analyser) {
-      // Try set up analyser now (user gesture might have happened)
-      player.setupAnalyser(el());
-    }
-    if (player.analyser && isPlaying() && player.mode === 'audio') {
-      const buf = new Uint8Array(player.analyser.frequencyBinCount);
-      player.analyser.getByteFrequencyData(buf);
-      const slice = Math.floor(buf.length / tempoBars.length);
-      tempoBars.forEach((bar, i) => {
-        let sum = 0;
-        for (let j = i * slice; j < (i + 1) * slice; j++) sum += buf[j];
-        const avg = sum / slice / 255; // 0..1
-        smooth[i] = smooth[i] * 0.65 + avg * 0.35;
-        const h = 8 + smooth[i] * 92; // %
-        bar.style.height = h + '%';
+  const barStates = Array.from(tempoBars).map(() => ({
+    current: 4,
+    target: 4,
+    speed: 0.04 + Math.random() * 0.08,
+    nextChangeAt: 0,
+    interval: 80 + Math.random() * 200,
+  }));
+
+  function tick(timestamp) {
+    if (isPlaying() && player.mode === 'audio') {
+      barStates.forEach((state, i) => {
+        // Pick new random target height every so often
+        if (timestamp >= state.nextChangeAt) {
+          state.target = 8 + Math.random() * 88; // % height
+          state.nextChangeAt = timestamp + state.interval + Math.random() * 100;
+        }
+        // Smooth towards target
+        state.current += (state.target - state.current) * state.speed * 1.8;
+        tempoBars[i].style.height = state.current + '%';
+      });
+    } else {
+      // Collapse bars when paused
+      barStates.forEach((state, i) => {
+        state.current += (4 - state.current) * 0.1;
+        tempoBars[i].style.height = state.current + '%';
       });
     }
     rafId = requestAnimationFrame(tick);
@@ -187,12 +277,13 @@
   setSeek(e0.currentTime || 0, e0.duration || 0);
   syncPlayingClass();
 
-  // ── Cleanup when navigating away ──
+  // ── Cleanup ──
   window.WAVR_PAGE_CLEANUP = () => {
     cancelAnimationFrame(rafId);
     document.removeEventListener('keydown', keyHandler);
     player.onUpdate.delete(onUpdate);
-    // Move video element back off-screen so it keeps playing in the background
+    const modal = document.getElementById('plDlModalBackdrop');
+    if (modal) modal.remove();
     Object.assign(videoEl.style, { position: 'fixed', left: '-9999px', top: '-9999px', width: '1px', height: '1px' });
     document.body.appendChild(videoEl);
   };
