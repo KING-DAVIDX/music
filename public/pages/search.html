@@ -1,0 +1,18 @@
+<link rel="stylesheet" href="/css/search.css" />
+<div class="page search-page" id="searchPage">
+  <div class="search-hero">
+    <h1 class="search-heading">Find any track.</h1>
+    <p class="search-sub">Search YouTube. Stream it. Save it.</p>
+    <div class="search-box">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" placeholder="Song, artist, album, lyrics..." autocomplete="off" />
+      <button class="sb-clear" id="searchClear" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- One container — its content swaps between "empty tip", "history", or "results" -->
+  <div class="search-stage" id="searchStage"></div>
+</div>
+<script src="/js/search.js"></script>

@@ -1,0 +1,35 @@
+<link rel="stylesheet" href="/css/home.css" />
+<div class="page home-page">
+  <header class="home-hero">
+    <div class="hero-eyebrow">Welcome back</div>
+    <h1 class="hero-title">Your music, <span class="grad-text">your way</span>.</h1>
+    <p class="hero-sub">Stream from anywhere, build your library, identify what's playing around you.</p>
+    <div class="hero-cta">
+      <a href="/search" data-route="/search" class="cta primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Start searching
+      </a>
+      <a href="/shazam" data-route="/shazam" class="cta ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a3 3 0 00-3 3v6a3 3 0 006 0V6a3 3 0 00-3-3z"/><path d="M19 11v1a7 7 0 01-14 0v-1"/></svg>
+        Identify a song
+      </a>
+    </div>
+  </header>
+
+  <div class="quick-tiles">
+    <button class="tile tile-most" data-action="most-played">
+      <span class="tile-label">Most played</span>
+      <span class="tile-title">Your top tracks</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg>
+    </button>
+    <button class="tile tile-recent" data-action="recent">
+      <span class="tile-label">Recently played</span>
+      <span class="tile-title">Pick up where you left off</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 15,15"/></svg>
+    </button>
+  </div>
+
+  <h2 class="section-title">Trending for you</h2>
+  <div id="homeGrid" class="track-grid"><div class="spinner"></div></div>
+</div>
+<script src="/js/home.js"></script>

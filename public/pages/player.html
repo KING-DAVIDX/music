@@ -1,0 +1,88 @@
+<link rel="stylesheet" href="/css/player.css" />
+<div class="page pl-page" id="plPage">
+  <!-- Header bar -->
+  <div class="pl-topbar">
+    <button class="pl-back" id="plBack" title="Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+    </button>
+    <div class="pl-eyebrow">Now playing</div>
+    <div class="pl-mode" id="plMode"></div>
+  </div>
+
+  <!-- Stage: cover for audio, video for video -->
+  <div class="pl-stage" id="plStage">
+    <!-- Audio cover -->
+    <div class="pl-cover" id="plCover">
+      <div class="pl-cover-img" id="plCoverImg"></div>
+      <div class="pl-cover-fallback" id="plCoverFallback">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+        </svg>
+      </div>
+      <!-- Tempo-reactive bars -->
+      <div class="tempo-bars" id="tempoBars" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <!-- Video stage (the actual #videoEl is moved in here at runtime) -->
+    <div class="pl-video-stage" id="plVideoStage" hidden>
+      <div class="pl-video-overlay" id="plVideoOverlay">
+        <div class="seek-flash left"  id="seekFlashL"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 17l-5-5 5-5v3h7v4h-7z"/></svg><span>-10s</span></div>
+        <div class="seek-flash right" id="seekFlashR"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 7l5 5-5 5v-3H6v-4h7z"/></svg><span>+10s</span></div>
+        <div class="pl-video-center">
+          <button class="pl-video-play" id="plVideoCenterPlay">
+            <svg class="ic-play"  viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Track info -->
+  <div class="pl-info">
+    <div class="pl-title" id="plTitle">—</div>
+    <div class="pl-artist" id="plArtist">Nothing playing</div>
+  </div>
+
+  <!-- Seek bar with notch -->
+  <div class="pl-seek-wrap">
+    <span class="pl-time" id="plCur">0:00</span>
+    <div class="pl-seek" id="plSeek">
+      <div class="pl-seek-track"></div>
+      <div class="pl-seek-fill" id="plSeekFill"></div>
+      <div class="pl-seek-thumb" id="plSeekThumb"></div>
+    </div>
+    <span class="pl-time" id="plDur">0:00</span>
+  </div>
+
+  <!-- Main controls -->
+  <div class="pl-controls">
+    <button class="pl-ctrl" id="plShuffle" title="Shuffle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21,16 21,21 16,21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+    </button>
+    <button class="pl-ctrl" id="plPrev" title="Previous">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+    </button>
+    <button class="pl-ctrl play" id="plPlay" title="Play/Pause">
+      <svg class="ic-play"  viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+    </button>
+    <button class="pl-ctrl" id="plNext" title="Next">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6zM16 6h2v12h-2z"/></svg>
+    </button>
+    <button class="pl-ctrl" id="plRepeat" title="Repeat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+    </button>
+  </div>
+
+  <!-- Volume row -->
+  <div class="pl-bottom">
+    <div class="pl-vol">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="currentColor"/><path d="M15.5 8.5a5 5 0 010 7"/></svg>
+      <input type="range" min="0" max="1" step=".02" value=".85" id="plVol" />
+    </div>
+  </div>
+</div>
+<script src="/js/player.js"></script>

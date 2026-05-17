@@ -1,0 +1,27 @@
+<link rel="stylesheet" href="/css/shazam.css" />
+<div class="page sz-page" id="szPage">
+  <!-- View 1: Mic / listening -->
+  <section class="sz-view sz-mic" id="szViewMic">
+    <h1 class="sz-title">Identify what's playing</h1>
+    <p class="sz-sub">Tap the orb and hold near the music for about 10 seconds.</p>
+    <button class="sz-orb" id="szOrb" aria-label="Identify">
+      <span class="sz-ring"></span>
+      <span class="sz-ring"></span>
+      <span class="sz-ring"></span>
+      <span class="sz-orb-inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+          <path d="M12 3a3 3 0 00-3 3v6a3 3 0 006 0V6a3 3 0 00-3-3z"/>
+          <path d="M19 11v1a7 7 0 01-14 0v-1"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+      </span>
+    </button>
+    <div class="sz-status" id="szStatus">Tap to start</div>
+
+    <div class="sz-history" id="szHistory"></div>
+  </section>
+
+  <!-- View 2: Result -->
+  <section class="sz-view sz-result-view" id="szViewResult" hidden></section>
+</div>
+<script src="/js/shazam.js"></script>
