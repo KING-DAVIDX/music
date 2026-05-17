@@ -35,7 +35,7 @@
 .sb-clear:hover { color: var(--text); }
 .sb-clear svg { width: 14px; height: 14px; }
 
-/* Background tip when no search and no history */
+/* Background tip */
 .tip-bg {
   position: relative;
   margin: 60px auto; max-width: 520px;
@@ -50,7 +50,7 @@
 .tip-bg h3 { color: var(--text); font-family: 'Space Grotesk',sans-serif; font-weight: 600; font-size: 1.15rem; margin-bottom: 8px; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
-/* History list — fades when results come in */
+/* History */
 .history-wrap {
   max-width: 760px; margin: 0 auto;
   animation: fadeIn .4s var(--ease);
@@ -71,7 +71,6 @@
 .chip svg { width: 12px; height: 12px; opacity: .6; }
 .chip:hover { border-color: var(--c-1); color: var(--c-1); background: rgba(56,189,248,.07); }
 
-/* Fade-out helper */
 .is-fading { animation: fadeOut .3s var(--ease) forwards; }
 @keyframes fadeOut { to { opacity: 0; transform: translateY(-6px); } }
 
@@ -82,3 +81,47 @@
 }
 .results-count { color: var(--text-2); font-size: .88rem; }
 .results-count strong { color: var(--text); font-weight: 600; }
+
+/* Track card download buttons */
+.tc-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding-left: 10px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--t);
+}
+.track-card:hover .tc-actions { opacity: 1; }
+
+.tc-dl-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .03em;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  transition: all var(--t);
+  white-space: nowrap;
+}
+.tc-dl-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+.tc-dl-btn .dl-arrow { opacity: .6; }
+.tc-dl-btn:hover {
+  color: var(--text);
+  background: var(--surface-2);
+  border-color: var(--c-1);
+  transform: translateY(-1px);
+}
+.tc-dl-audio:hover { color: var(--c-1); }
+.tc-dl-video:hover { color: #f472b6; border-color: #f472b6; }
+
+@media (max-width: 600px) {
+  .tc-actions { opacity: 1; }
+  .tc-dl-btn { padding: 5px 8px; font-size: .68rem; }
+}

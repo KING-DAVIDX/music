@@ -21,27 +21,30 @@
 
 /* Stage */
 .pl-stage {
-  position: relative; width: 100%; max-width: 480px;
+  position: relative; width: 100%; max-width: 380px;
   aspect-ratio: 1/1;
   margin: 16px auto 36px;
 }
-.pl-cover, .pl-video-stage {
-  position: absolute; inset: 0;
-  border-radius: var(--r-xl);
-  overflow: hidden;
-}
+
+/* ── Circular audio cover with pulse ── */
 .pl-cover {
+  position: absolute; inset: 0;
+  border-radius: 50%;               /* CIRCLE */
+  overflow: visible;                /* allow pulse rings to bleed out */
   background: var(--bg-3);
   box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 0 0 1px var(--border-2);
 }
+/* inner clip so image stays circular */
 .pl-cover-img {
   position: absolute; inset: 0;
+  border-radius: 50%;
   background-size: cover; background-position: center;
   transition: opacity .3s var(--ease);
 }
 .pl-cover:not(.has-image) .pl-cover-img { opacity: 0; }
 .pl-cover-fallback {
   position: absolute; inset: 0;
+  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   background: var(--grad-brand); color: white;
   transition: opacity .3s var(--ease);
@@ -49,8 +52,59 @@
 .pl-cover.has-image .pl-cover-fallback { opacity: 0; }
 .pl-cover-fallback svg { width: 80px; height: 80px; opacity: .9; }
 
-/* Video */
+/* Pulse rings — like Shazam mic effect */
+.pl-cover::before,
+.pl-cover::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(56,189,248,.35);
+  opacity: 0;
+  transform: scale(1);
+  pointer-events: none;
+}
+.pl-cover::after { inset: -18px; border-color: rgba(99,102,241,.25); animation-delay: .7s; }
+
+.pl-page.is-playing .pl-cover::before {
+  animation: coverPulse 2s ease-out infinite;
+}
+.pl-page.is-playing .pl-cover::after {
+  animation: coverPulse 2s ease-out infinite .7s;
+}
+
+@keyframes coverPulse {
+  0%   { opacity: .85; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(1.18); }
+}
+
+/* Extra slow outer glow pulse */
+.pl-cover-glow {
+  position: absolute;
+  inset: -32px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(249,115,115,.18);
+  opacity: 0;
+  pointer-events: none;
+}
+.pl-page.is-playing .pl-cover-glow {
+  animation: coverPulse 2s ease-out infinite 1.4s;
+}
+
+/* Slow spin when playing — subtle */
+.pl-page.is-playing .pl-cover-img {
+  animation: coverSpin 18s linear infinite;
+}
+@keyframes coverSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Video stage stays rectangular */
 .pl-video-stage {
+  position: absolute; inset: 0;
+  border-radius: var(--r-xl);
+  overflow: hidden;
   background: #000;
   box-shadow: 0 30px 80px rgba(0,0,0,.7);
 }
@@ -100,27 +154,33 @@
   100% { opacity: 0; transform: scale(1.05); }
 }
 
-/* Tempo bars overlay (only over audio cover) */
+/* ── Tempo bars — random colourful, at the bottom of the circular cover ── */
 .tempo-bars {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  height: 36%;
-  display: flex; align-items: flex-end; justify-content: center;
-  gap: 5px;
-  padding: 0 14%;
+  position: absolute;
+  left: 50%;
+  bottom: -52px;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 44px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
   pointer-events: none;
+  z-index: 2;
 }
 .tempo-bars span {
-  flex: 1; background: rgba(255,255,255,.85);
-  border-radius: 99px 99px 0 0;
-  height: 8%;
-  transition: height .12s ease-out, opacity .2s;
+  flex: 1;
+  border-radius: 99px 99px 3px 3px;
+  height: 4px;
   opacity: 0;
-  box-shadow: 0 0 12px rgba(56,189,248,.5);
+  transition: opacity .25s;
+  /* each bar gets a unique color via inline style set in JS */
 }
-.pl-page.is-playing .pl-cover .tempo-bars span { opacity: .9; }
+.pl-page.is-playing .pl-cover .tempo-bars span { opacity: 1; }
 
 /* Track info */
-.pl-info { text-align: center; margin-bottom: 20px; padding: 0 12px; }
+.pl-info { text-align: center; margin-bottom: 20px; padding: 0 12px; margin-top: 16px; }
 .pl-title {
   font-family: 'Space Grotesk',sans-serif;
   font-weight: 700; font-size: 1.45rem; letter-spacing: -.015em;
@@ -130,7 +190,7 @@
 }
 .pl-artist { color: var(--text-2); font-size: .95rem; }
 
-/* Seek bar with notch */
+/* Seek bar */
 .pl-seek-wrap {
   display: flex; align-items: center; gap: 12px;
   width: 100%; max-width: 480px; margin: 0 auto 24px;
@@ -190,8 +250,11 @@
 .pl-page.is-playing .pl-ctrl.play .ic-play  { display: none; }
 .pl-page.is-playing .pl-ctrl.play .ic-pause { display: block; }
 
-/* Bottom */
-.pl-bottom { width: 100%; max-width: 480px; }
+/* Bottom row: volume + download */
+.pl-bottom {
+  width: 100%; max-width: 480px;
+  display: flex; flex-direction: column; gap: 14px;
+}
 .pl-vol { display: flex; align-items: center; gap: 10px; color: var(--text-2); }
 .pl-vol svg { width: 16px; height: 16px; }
 .pl-vol input {
@@ -203,7 +266,84 @@
   background: var(--text); cursor: pointer;
 }
 
+/* Download button */
+.pl-download-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: .9rem; font-weight: 500;
+  transition: all var(--t);
+  cursor: pointer;
+}
+.pl-download-btn svg { width: 16px; height: 16px; }
+.pl-download-btn:hover {
+  color: var(--text);
+  background: var(--surface-2);
+  border-color: var(--c-1);
+}
+
+/* Download mini-modal */
+.pl-dl-modal-backdrop {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: flex-end; justify-content: center;
+  animation: dlFadeIn .2s var(--ease);
+}
+@keyframes dlFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.pl-dl-modal {
+  width: 100%; max-width: 480px;
+  background: var(--card);
+  border: 1px solid var(--border-2);
+  border-radius: 20px 20px 0 0;
+  padding: 28px 24px 40px;
+  animation: dlSlideUp .28s var(--ease);
+}
+@keyframes dlSlideUp {
+  from { transform: translateY(60px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.pl-dl-modal-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+.pl-dl-modal-sub {
+  color: var(--text-2); font-size: .85rem;
+  margin-bottom: 22px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pl-dl-options {
+  display: flex; gap: 12px;
+}
+.pl-dl-option {
+  flex: 1; padding: 16px 12px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border-2);
+  background: var(--surface);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  cursor: pointer; transition: all var(--t);
+  font-size: .9rem; font-weight: 500;
+}
+.pl-dl-option svg { width: 26px; height: 26px; }
+.pl-dl-option:hover { border-color: var(--c-1); background: rgba(56,189,248,.07); color: var(--c-1); transform: translateY(-2px); }
+.pl-dl-option.video:hover { border-color: #f472b6; background: rgba(244,114,182,.07); color: #f472b6; }
+.pl-dl-modal-cancel {
+  display: block; width: 100%; margin-top: 12px;
+  padding: 12px; text-align: center;
+  color: var(--text-2); font-size: .88rem;
+  border-radius: 10px; transition: background var(--t);
+  cursor: pointer;
+}
+.pl-dl-modal-cancel:hover { background: var(--surface-2); color: var(--text); }
+
 @media (max-width: 600px) {
-  .pl-stage { max-width: none; }
+  .pl-stage { max-width: none; max-width: 300px; }
   .pl-title { font-size: 1.2rem; }
+  .pl-dl-modal { border-radius: 20px 20px 0 0; }
 }
